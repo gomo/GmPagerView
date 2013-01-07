@@ -16,6 +16,8 @@
 		2C859D971699D3FD00BD7CF3 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C859D961699D3FD00BD7CF3 /* Default.png */; };
 		2C859D991699D3FD00BD7CF3 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C859D981699D3FD00BD7CF3 /* Default@2x.png */; };
 		2C859D9B1699D3FD00BD7CF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C859D9A1699D3FD00BD7CF3 /* Default-568h@2x.png */; };
+		2C859DA41699D4C800BD7CF3 /* GmPagerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C859DA31699D4C800BD7CF3 /* GmPagerView.m */; };
+		2C859DA71699D4E900BD7CF3 /* GmPagerViewPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C859DA61699D4E900BD7CF3 /* GmPagerViewPage.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,10 @@
 		2C859D961699D3FD00BD7CF3 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		2C859D981699D3FD00BD7CF3 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		2C859D9A1699D3FD00BD7CF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		2C859DA21699D4C800BD7CF3 /* GmPagerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GmPagerView.h; sourceTree = "<group>"; };
+		2C859DA31699D4C800BD7CF3 /* GmPagerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GmPagerView.m; sourceTree = "<group>"; };
+		2C859DA51699D4E900BD7CF3 /* GmPagerViewPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GmPagerViewPage.h; sourceTree = "<group>"; };
+		2C859DA61699D4E900BD7CF3 /* GmPagerViewPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GmPagerViewPage.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +57,7 @@
 		2C859D751699D3FD00BD7CF3 = {
 			isa = PBXGroup;
 			children = (
+				2C859DA11699D48D00BD7CF3 /* GmPagerView */,
 				2C859D8A1699D3FD00BD7CF3 /* GmPagerView */,
 				2C859D831699D3FD00BD7CF3 /* Frameworks */,
 				2C859D811699D3FD00BD7CF3 /* Products */,
@@ -97,6 +104,18 @@
 				2C859D9A1699D3FD00BD7CF3 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		2C859DA11699D48D00BD7CF3 /* GmPagerView */ = {
+			isa = PBXGroup;
+			children = (
+				2C859DA21699D4C800BD7CF3 /* GmPagerView.h */,
+				2C859DA31699D4C800BD7CF3 /* GmPagerView.m */,
+				2C859DA51699D4E900BD7CF3 /* GmPagerViewPage.h */,
+				2C859DA61699D4E900BD7CF3 /* GmPagerViewPage.m */,
+			);
+			name = GmPagerView;
+			path = GmPagerView/GmPagerView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,6 +186,8 @@
 			files = (
 				2C859D911699D3FD00BD7CF3 /* main.m in Sources */,
 				2C859D951699D3FD00BD7CF3 /* GmAppDelegate.m in Sources */,
+				2C859DA41699D4C800BD7CF3 /* GmPagerView.m in Sources */,
+				2C859DA71699D4E900BD7CF3 /* GmPagerViewPage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
