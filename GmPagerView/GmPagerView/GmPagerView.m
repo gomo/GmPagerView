@@ -20,6 +20,8 @@
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
+        
+        _isFixingOffset = NO;
     }
     return self;
 }
@@ -28,100 +30,142 @@
 {
     _cachedPages = [[NSMutableDictionary alloc]init];
     
-    if(_currentUniqueKey == nil)
+    if(_currentKey == nil)
     {
-        _currentUniqueKey = [self.pagerViewDataSource uniqueKeyInitialForPagerView:self];
+        _currentKey = [self.pagerViewDataSource initialKeyForPagerView:self];
     }
     
-    [self loadPagesWithDisplayUniqueKey:_currentUniqueKey];
+    [self loadPagesWithDisplayKey:_currentKey];
 }
 
 #pragma mark - private
-- (void)loadPagesWithDisplayUniqueKey:(id)displayUniqueKey
+- (void)loadPagesWithDisplayKey:(id)displayKey
 {
-    GmPagerViewPage *displayPage = [self loadPageWithUniqueKey:displayUniqueKey];
-    GmPagerViewPage *prevPage = [self loadPageWithBaseUniqueKey:displayUniqueKey direction:GmPagerViewDirectionPrev];
-    GmPagerViewPage *nextPage = [self loadPageWithBaseUniqueKey:displayUniqueKey direction:GmPagerViewDirectionNext];
+    GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
+    
+    GmPagerViewPage *prevPage = nil;
+    id prevKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionPrev];
+    if(prevKey != nil)
+    {
+        prevPage = [self loadPageWithKey:prevKey];
+    }
+    
+    GmPagerViewPage *nextPage = nil;
+    id nextvKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionNext];
+    if(nextvKey != nil)
+    {
+        nextPage = [self loadPageWithKey:nextvKey];
+    }
     
     if(prevPage == nil && nextPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height);
-        displayPage.frame = [self createRectForPagePosition:0];
-        [self addSubview:displayPage];
+        [self setPage:displayPage toPosition:0 withKey:displayKey];
         _currentPagePosition = 0;
     }
     else if(prevPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
-        displayPage.frame = [self createRectForPagePosition:0];
-        nextPage.frame = [self createRectForPagePosition:1];
-        [self addSubview:displayPage];
-        [self addSubview:nextPage];
+        [self setPage:displayPage toPosition:0 withKey:displayKey];
+        [self setPage:nextPage toPosition:1 withKey:nextvKey];
         _currentPagePosition = 0;
     }
     else if(nextPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
-        displayPage.frame = [self createRectForPagePosition:1];
-        prevPage.frame = [self createRectForPagePosition:0];
         [self movePageToPosition:1];
-        [self addSubview:displayPage];
-        [self addSubview:prevPage];
+        [self setPage:displayPage toPosition:1 withKey:displayKey];
+        [self setPage:prevPage toPosition:0 withKey:prevKey];
         _currentPagePosition = 1;
     }
     else
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
-        displayPage.frame = [self createRectForPagePosition:1];
-        prevPage.frame = [self createRectForPagePosition:0];
-        nextPage.frame = [self createRectForPagePosition:2];
         [self movePageToPosition:1];
-        [self addSubview:displayPage];
-        [self addSubview:prevPage];
-        [self addSubview:nextPage];
+        [self setPage:prevPage toPosition:0 withKey:prevKey];
+        [self setPage:displayPage toPosition:1 withKey:displayKey];
+        [self setPage:nextPage toPosition:2 withKey:nextvKey];
         _currentPagePosition = 1;
     }
     
-    _currentUniqueKey = displayUniqueKey;
+    _currentKey = displayKey;
+    
+    
+}
+
+- (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
+{
+    page.frame = CGRectMake(self.frame.size.width * position, 0, self.frame.size.width, self.frame.size.height);
+    [self addSubview:page];
+    
+    [_cachedPages setObject:@{@"page":page, @"key":key} forKey:[NSNumber numberWithInteger:position]];
+}
+
+- (void)clearCacheAtPagePosition:(NSInteger)position
+{
+    NSNumber *posNumber = [NSNumber numberWithInteger:position];
+    
+    NSDictionary *dic = [_cachedPages objectForKey:posNumber];
+    [_cachedPages removeObjectForKey:posNumber];
+    GmPagerViewPage *page = [dic objectForKey:@"page"];
+    
+    [page removeFromSuperview];
 }
 
 - (void) movePageToPosition:(NSInteger)position
 {
+    _isFixingOffset = YES;
     self.contentOffset = CGPointMake(self.frame.size.width * position, 0);
 }
 
-- (CGRect)createRectForPagePosition:(NSInteger)position
+- (GmPagerViewPage *)pageFromCache:(id)key
 {
-    return CGRectMake(self.frame.size.width * position, 0, self.frame.size.width, self.frame.size.height);
-}
-
-- (GmPagerViewPage *)loadPageWithUniqueKey:(id)uniqueKey
-{
-    GmPagerViewPage *page = [_cachedPages objectForKey:uniqueKey];
-    if(page == nil)
+    GmPagerViewPage *page = nil;
+    for (NSNumber *posNum in _cachedPages)
     {
-        page = [self.pagerViewDataSource pageWithUniqueKey:uniqueKey forPagerView:self];
-        [_cachedPages setObject:page forKey:uniqueKey];
+        NSDictionary *dic = [_cachedPages objectForKey:posNum];
+        id targetKey = [dic objectForKey:@"key"];
+        if([targetKey isEqual:key])
+        {
+            page = [dic objectForKey:@"page"];
+            break;
+        }
     }
     
     return page;
 }
 
-- (GmPagerViewPage *)loadPageWithBaseUniqueKey:(id)baseUniqueKey direction:(GmPagerViewDirection)direction
+- (GmPagerViewPage *)loadPageWithKey:(id)key
 {
-    GmPagerViewPage *page = nil;
-    id uniqueKey = [self.pagerViewDataSource uniqueKeyWithBaseUniqueKey:baseUniqueKey direction:direction forPagerView:self];
-    if(uniqueKey != nil)
+    GmPagerViewPage *page = [self pageFromCache:key];
+    
+    if(page == nil)
     {
-        page = [self loadPageWithUniqueKey:uniqueKey];
+        page = [self.pagerViewDataSource pagerView:self pageForKey:key];
     }
     
     return page;
 }
 
 #pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if(![_prevKey isEqual:_currentKey])
+    {
+        _prevKey = _currentKey;
+        NSLog(@"Page Changed");
+    }
+    
+    _isFixingOffset = NO;
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    if(_isFixingOffset)
+    {
+        return;
+    }
+    
     CGFloat pageWidth = scrollView.frame.size.width;
     float fractionalPage = scrollView.contentOffset.x / pageWidth;
     
@@ -139,17 +183,25 @@
         
         if(newPage != _currentPagePosition)
         {
-            id uniqueKey;
+            id key;
             if(newPage > _currentPagePosition)
             {
-                uniqueKey = [self.pagerViewDataSource uniqueKeyWithBaseUniqueKey:_currentUniqueKey direction:GmPagerViewDirectionNext forPagerView:self];
+                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_currentKey direction:GmPagerViewDirectionNext];
+                if(_cachedPages.count == 3)
+                {
+                    [self clearCacheAtPagePosition:0];
+                }
             }
             else
             {
-                uniqueKey = [self.pagerViewDataSource uniqueKeyWithBaseUniqueKey:_currentUniqueKey direction:GmPagerViewDirectionPrev forPagerView:self];
+                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_currentKey direction:GmPagerViewDirectionPrev];
+                if(_cachedPages.count == 3)
+                {
+                    [self clearCacheAtPagePosition:2];
+                }
             }
             
-            [self loadPagesWithDisplayUniqueKey:uniqueKey];
+            [self loadPagesWithDisplayKey:key];
         }
     }
 }

@@ -17,9 +17,9 @@ typedef enum {
 @class GmPagerView;
 @protocol GmPagerViewDataSource
 
-- (id<NSCopying>)uniqueKeyInitialForPagerView:(GmPagerView *)pagerView;
-- (id<NSCopying>)uniqueKeyWithBaseUniqueKey:(id<NSCopying>)baseUniqueKey direction:(GmPagerViewDirection) direction forPagerView:(GmPagerView *)pagerView;
-- (GmPagerViewPage *)pageWithUniqueKey:(id<NSCopying>)uniqueKey forPagerView:(GmPagerView *)pagerView;
+- (id)initialKeyForPagerView:(GmPagerView *)pagerView;
+- (id)pagerView:(GmPagerView *)pagerView keyWithBaseKey:(id)baseKey direction:(GmPagerViewDirection)direction;
+- (GmPagerViewPage *)pagerView:(GmPagerView *)pagerView pageForKey:(id)key;
 
 @end
 
@@ -33,7 +33,9 @@ typedef enum {
 {
     NSMutableDictionary *_cachedPages;
     NSInteger _currentPagePosition;
-    id _currentUniqueKey;
+    id _prevKey;
+    id _currentKey;
+    BOOL _isFixingOffset;
 }
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;
