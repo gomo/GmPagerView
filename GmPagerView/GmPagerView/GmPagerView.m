@@ -21,14 +21,14 @@
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
         
-        _isFixingOffset = NO;
+        _reusablePages = [[NSMutableDictionary alloc]init];
     }
     return self;
 }
 
 - (void)loadPage
 {
-    _cachedPages = [[NSMutableDictionary alloc]init];
+    _cachedPages = [[NSMutableDictionary alloc]initWithCapacity:3];
     
     if(_currentKey == nil)
     {
@@ -36,6 +36,13 @@
     }
     
     [self loadPagesWithDisplayKey:_currentKey];
+}
+
+- (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier
+{
+    GmPagerViewPage *page = [_reusablePages objectForKey:identifier];
+    [_reusablePages removeObjectForKey:identifier];
+    return page;
 }
 
 #pragma mark - private
@@ -89,8 +96,6 @@
     }
     
     _currentKey = displayKey;
-    
-    
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -110,11 +115,12 @@
     GmPagerViewPage *page = [dic objectForKey:@"page"];
     
     [page removeFromSuperview];
+    
+    [_reusablePages setObject:page forKey:page.reuseIdentifier];
 }
 
 - (void) movePageToPosition:(NSInteger)position
 {
-    _isFixingOffset = YES;
     self.contentOffset = CGPointMake(self.frame.size.width * position, 0);
 }
 
@@ -148,24 +154,8 @@
 }
 
 #pragma mark - UIScrollViewDelegate
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    if(![_prevKey isEqual:_currentKey])
-    {
-        _prevKey = _currentKey;
-        NSLog(@"Page Changed");
-    }
-    
-    _isFixingOffset = NO;
-}
-
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if(_isFixingOffset)
-    {
-        return;
-    }
-    
     CGFloat pageWidth = scrollView.frame.size.width;
     float fractionalPage = scrollView.contentOffset.x / pageWidth;
     

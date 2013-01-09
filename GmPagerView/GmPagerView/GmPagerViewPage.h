@@ -9,5 +9,12 @@
 #import <UIKit/UIKit.h>
 
 @interface GmPagerViewPage : UIView
+{
+    NSString *_reuseIdentifier;
+}
+
+@property(nonatomic, readonly) NSString *reuseIdentifier;
+
+- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 
 @end

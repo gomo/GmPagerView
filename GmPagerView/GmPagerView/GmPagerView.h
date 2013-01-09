@@ -35,12 +35,13 @@ typedef enum {
     NSInteger _currentPagePosition;
     id _prevKey;
     id _currentKey;
-    BOOL _isFixingOffset;
+    NSMutableDictionary *_reusablePages;
 }
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;
 @property (nonatomic, weak) id<GmPagerViewDelegate> pagerViewDelegate;
 
 - (void)loadPage;
+- (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier;
 
 @end
