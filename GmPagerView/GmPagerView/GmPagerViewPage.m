@@ -22,4 +22,9 @@
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ [pageKey = %@]", [super description], self.pageKey];
+}
+
 @end

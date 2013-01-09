@@ -45,6 +45,8 @@
 {
     GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
     
+    [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:_displayPage];
+    
     GmPagerViewPage *leftPage = nil;
     id leftKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionLeft];
     if(leftKey != nil)
@@ -89,6 +91,8 @@
         [self setPage:rightPage toPosition:2 withKey:rightKey];
         _currentPagePosition = 1;
     }
+    
+    [self.pagerViewDelegate pagerView:self didShowPage:displayPage fromPage:_displayPage];
     
     _displayPage = displayPage;
 }
