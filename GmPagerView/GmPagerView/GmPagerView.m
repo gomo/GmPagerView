@@ -30,12 +30,7 @@
 {
     _cachedPages = [[NSMutableDictionary alloc]initWithCapacity:3];
     
-    if(_currentKey == nil)
-    {
-        _currentKey = [self.pagerViewDataSource initialKeyForPagerView:self];
-    }
-    
-    [self loadPagesWithDisplayKey:_currentKey];
+    [self loadPagesWithDisplayKey:[self.pagerViewDataSource initialKeyForPagerView:self]];
 }
 
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier
@@ -50,52 +45,52 @@
 {
     GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
     
-    GmPagerViewPage *prevPage = nil;
-    id prevKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionPrev];
-    if(prevKey != nil)
+    GmPagerViewPage *leftPage = nil;
+    id leftKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionLeft];
+    if(leftKey != nil)
     {
-        prevPage = [self loadPageWithKey:prevKey];
+        leftPage = [self loadPageWithKey:leftKey];
     }
     
-    GmPagerViewPage *nextPage = nil;
-    id nextvKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionNext];
-    if(nextvKey != nil)
+    GmPagerViewPage *rightPage = nil;
+    id rightKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionRight];
+    if(rightKey != nil)
     {
-        nextPage = [self loadPageWithKey:nextvKey];
+        rightPage = [self loadPageWithKey:rightKey];
     }
     
-    if(prevPage == nil && nextPage == nil)
+    if(leftPage == nil && rightPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height);
         [self setPage:displayPage toPosition:0 withKey:displayKey];
         _currentPagePosition = 0;
     }
-    else if(prevPage == nil)
+    else if(leftPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
         [self setPage:displayPage toPosition:0 withKey:displayKey];
-        [self setPage:nextPage toPosition:1 withKey:nextvKey];
+        [self setPage:rightPage toPosition:1 withKey:rightKey];
         _currentPagePosition = 0;
     }
-    else if(nextPage == nil)
+    else if(rightPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
         [self movePageToPosition:1];
         [self setPage:displayPage toPosition:1 withKey:displayKey];
-        [self setPage:prevPage toPosition:0 withKey:prevKey];
+        [self setPage:leftPage toPosition:0 withKey:leftKey];
         _currentPagePosition = 1;
     }
     else
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
         [self movePageToPosition:1];
-        [self setPage:prevPage toPosition:0 withKey:prevKey];
+        [self setPage:leftPage toPosition:0 withKey:leftKey];
         [self setPage:displayPage toPosition:1 withKey:displayKey];
-        [self setPage:nextPage toPosition:2 withKey:nextvKey];
+        [self setPage:rightPage toPosition:2 withKey:rightKey];
         _currentPagePosition = 1;
     }
     
-    _currentKey = displayKey;
+    _displayPage = displayPage;
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -115,6 +110,7 @@
     GmPagerViewPage *page = [dic objectForKey:@"page"];
     
     [page removeFromSuperview];
+    page.pageKey = nil;
     
     [_reusablePages setObject:page forKey:page.reuseIdentifier];
 }
@@ -150,6 +146,8 @@
         page = [self.pagerViewDataSource pagerView:self pageForKey:key];
     }
     
+    page.pageKey = key;
+    
     return page;
 }
 
@@ -176,7 +174,7 @@
             id key;
             if(newPage > _currentPagePosition)
             {
-                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_currentKey direction:GmPagerViewDirectionNext];
+                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionRight];
                 if(_cachedPages.count == 3)
                 {
                     [self clearCacheAtPagePosition:0];
@@ -184,7 +182,7 @@
             }
             else
             {
-                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_currentKey direction:GmPagerViewDirectionPrev];
+                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionLeft];
                 if(_cachedPages.count == 3)
                 {
                     [self clearCacheAtPagePosition:2];

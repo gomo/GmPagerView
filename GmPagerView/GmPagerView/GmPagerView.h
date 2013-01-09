@@ -10,8 +10,8 @@
 #import "GmPagerViewPage.h"
 
 typedef enum {
-    GmPagerViewDirectionPrev,
-    GmPagerViewDirectionNext
+    GmPagerViewDirectionLeft,
+    GmPagerViewDirectionRight
 } GmPagerViewDirection;
 
 @class GmPagerView;
@@ -25,7 +25,8 @@ typedef enum {
 
 @protocol GmPagerViewDelegate
 
-- (void)pagerView:(GmPagerView *)pagerView didShowPage:(GmPagerViewPage *)page;
+- (void)pagerView:(GmPagerView *)pagerView willShowPage:(GmPagerViewPage *)page fromPage:(GmPagerViewPage *)prevPage;
+- (void)pagerView:(GmPagerView *)pagerView didShowPage:(GmPagerViewPage *)page fromPage:(GmPagerViewPage *)prevPage;
 
 @end
 
@@ -33,8 +34,7 @@ typedef enum {
 {
     NSMutableDictionary *_cachedPages;
     NSInteger _currentPagePosition;
-    id _prevKey;
-    id _currentKey;
+    GmPagerViewPage *_displayPage;
     NSMutableDictionary *_reusablePages;
 }
 
