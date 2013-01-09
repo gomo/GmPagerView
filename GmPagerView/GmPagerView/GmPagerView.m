@@ -28,15 +28,22 @@
 
 - (void)loadPage
 {
-    _cachedPages = [[NSMutableDictionary alloc]initWithCapacity:3];
+    _cachedPages = [[NSMutableDictionary alloc]init];
     
     [self loadPagesWithDisplayKey:[self.pagerViewDataSource initialKeyForPagerView:self]];
 }
 
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier
 {
-    GmPagerViewPage *page = [_reusablePages objectForKey:identifier];
-    [_reusablePages removeObjectForKey:identifier];
+    NSMutableArray *caches = [_reusablePages objectForKey:identifier];
+    if(caches == nil)
+    {
+        return nil;
+    }
+    
+    GmPagerViewPage *page = [caches objectAtIndex:0];
+    [caches removeObjectAtIndex:0];
+    
     return page;
 }
 
@@ -49,6 +56,7 @@
     
     GmPagerViewPage *leftPage = nil;
     id leftKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionLeft];
+    
     if(leftKey != nil)
     {
         leftPage = [self loadPageWithKey:leftKey];
@@ -108,15 +116,20 @@
 - (void)clearCacheAtPagePosition:(NSInteger)position
 {
     NSNumber *posNumber = [NSNumber numberWithInteger:position];
-    
     NSDictionary *dic = [_cachedPages objectForKey:posNumber];
     [_cachedPages removeObjectForKey:posNumber];
     GmPagerViewPage *page = [dic objectForKey:@"page"];
-    
     [page removeFromSuperview];
     page.pageKey = nil;
     
-    [_reusablePages setObject:page forKey:page.reuseIdentifier];
+    NSMutableArray *caches = [_reusablePages objectForKey:page.reuseIdentifier];
+    if(caches == nil)
+    {
+        caches = [[NSMutableArray alloc]init];
+        [_reusablePages setObject:caches forKey:page.reuseIdentifier];
+    }
+    
+    [caches addObject:page];
 }
 
 - (void) movePageToPosition:(NSInteger)position
@@ -127,6 +140,7 @@
 - (GmPagerViewPage *)pageFromCache:(id)key
 {
     GmPagerViewPage *page = nil;
+    NSNumber *removePosNum = nil;
     for (NSNumber *posNum in _cachedPages)
     {
         NSDictionary *dic = [_cachedPages objectForKey:posNum];
@@ -134,8 +148,14 @@
         if([targetKey isEqual:key])
         {
             page = [dic objectForKey:@"page"];
+            removePosNum = posNum;
             break;
         }
+    }
+    
+    if(removePosNum != nil)
+    {
+        [_cachedPages removeObjectForKey:removePosNum];
     }
     
     return page;
