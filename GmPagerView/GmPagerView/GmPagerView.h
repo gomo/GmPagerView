@@ -36,6 +36,7 @@ typedef enum {
     NSInteger _currentPagePosition;
     GmPagerViewPage *_displayPage;
     NSMutableDictionary *_reusablePages;
+    BOOL _fixing;
 }
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;

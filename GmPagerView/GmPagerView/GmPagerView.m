@@ -21,6 +21,8 @@
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
         
+        _fixing = NO;
+        
         _reusablePages = [[NSMutableDictionary alloc]init];
     }
     return self;
@@ -51,7 +53,6 @@
 - (void)loadPagesWithDisplayKey:(id)displayKey
 {
     GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
-    
     [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:_displayPage];
     
     GmPagerViewPage *leftPage = nil;
@@ -68,6 +69,8 @@
     {
         rightPage = [self loadPageWithKey:rightKey];
     }
+    
+    _fixing = YES;
     
     if(leftPage == nil && rightPage == nil)
     {
@@ -103,6 +106,8 @@
     [self.pagerViewDelegate pagerView:self didShowPage:displayPage fromPage:_displayPage];
     
     _displayPage = displayPage;
+    
+    _fixing = NO;
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -178,42 +183,44 @@
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    CGFloat pageWidth = scrollView.frame.size.width;
-    float fractionalPage = scrollView.contentOffset.x / pageWidth;
-    
-    if(_currentPagePosition != fractionalPage)
+    if(!_fixing)
     {
-        NSInteger newPage;
-        if(fractionalPage > _currentPagePosition)
+        CGFloat pageWidth = scrollView.frame.size.width;
+        float fractionalPage = scrollView.contentOffset.x / pageWidth;
+        if(_currentPagePosition != fractionalPage)
         {
-            newPage = floorf(fractionalPage);
-        }
-        else if(fractionalPage < _currentPagePosition)
-        {
-            newPage = ceilf(fractionalPage);
-        }
-        
-        if(newPage != _currentPagePosition)
-        {
-            id key;
-            if(newPage > _currentPagePosition)
+            NSInteger newPage;
+            if(fractionalPage > _currentPagePosition)
             {
-                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionRight];
-                if(_cachedPages.count == 3)
-                {
-                    [self clearCacheAtPagePosition:0];
-                }
+                newPage = floorf(fractionalPage);
             }
-            else
+            else if(fractionalPage < _currentPagePosition)
             {
-                key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionLeft];
-                if(_cachedPages.count == 3)
-                {
-                    [self clearCacheAtPagePosition:2];
-                }
+                newPage = ceilf(fractionalPage);
             }
             
-            [self loadPagesWithDisplayKey:key];
+            if(newPage != _currentPagePosition)
+            {
+                id key;
+                if(newPage > _currentPagePosition)
+                {
+                    key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionRight];
+                    if(_cachedPages.count == 3)
+                    {
+                        [self clearCacheAtPagePosition:0];
+                    }
+                }
+                else
+                {
+                    key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionLeft];
+                    if(_cachedPages.count == 3)
+                    {
+                        [self clearCacheAtPagePosition:2];
+                    }
+                }
+                
+                [self loadPagesWithDisplayKey:key];
+            }
         }
     }
 }
