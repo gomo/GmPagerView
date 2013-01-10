@@ -45,8 +45,12 @@
         return nil;
     }
     
-    GmPagerViewPage *page = [caches objectAtIndex:0];
-    [caches removeObjectAtIndex:0];
+    GmPagerViewPage *page = nil;
+    if(caches.count > 0)
+    {
+        page = [caches objectAtIndex:0];
+        [caches removeObjectAtIndex:0];
+    }
     
     return page;
 }
@@ -54,6 +58,8 @@
 #pragma mark - private
 - (void)loadPagesWithDisplayKey:(id)displayKey
 {
+    
+    
     GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
     [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:_displayPage];
     
@@ -128,6 +134,7 @@
     GmPagerViewPage *page = [dic objectForKey:@"page"];
     [page removeFromSuperview];
     page.pageKey = nil;
+    [page prepareForReuse];
     
     NSAssert1(page.reuseIdentifier != nil, @"reuseIdentifier is null for %@", page);
     

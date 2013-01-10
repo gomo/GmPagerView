@@ -16,4 +16,6 @@
 @property(nonatomic, strong) NSString *reuseIdentifier;
 @property(nonatomic, strong) id pageKey;
 
+- (void)prepareForReuse;
+
 @end
