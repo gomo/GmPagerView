@@ -10,6 +10,8 @@
 
 @implementation GmPagerView
 
+@synthesize displayPage = _displayPage;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];

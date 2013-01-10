@@ -41,6 +41,7 @@ typedef enum {
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;
 @property (nonatomic, weak) id<GmPagerViewDelegate> pagerViewDelegate;
+@property (nonatomic, readonly) GmPagerViewPage *displayPage;
 
 - (void)loadPage;
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier;
