@@ -127,6 +127,8 @@
     [page removeFromSuperview];
     page.pageKey = nil;
     
+    NSAssert1(page.reuseIdentifier != nil, @"reuseIdentifier is null for %@", page);
+    
     NSMutableArray *caches = [_reusablePages objectForKey:page.reuseIdentifier];
     if(caches == nil)
     {

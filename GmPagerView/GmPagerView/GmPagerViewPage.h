@@ -10,12 +10,10 @@
 
 @interface GmPagerViewPage : UIView
 {
-    NSString *_reuseIdentifier;
+    
 }
 
-@property(nonatomic, readonly) NSString *reuseIdentifier;
+@property(nonatomic, strong) NSString *reuseIdentifier;
 @property(nonatomic, strong) id pageKey;
-
-- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
 
 @end

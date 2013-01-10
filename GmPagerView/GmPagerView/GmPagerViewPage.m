@@ -10,18 +10,6 @@
 
 @implementation GmPagerViewPage
 
-@synthesize reuseIdentifier = _reuseIdentifier;
-
-- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier;
-{
-    self = [super init];
-    if (self)
-    {
-        _reuseIdentifier = reuseIdentifier;
-    }
-    return self;
-}
-
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ [pageKey = %@]", [super description], self.pageKey];
