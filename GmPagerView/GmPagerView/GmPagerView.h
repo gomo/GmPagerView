@@ -37,14 +37,20 @@ typedef enum {
     GmPagerViewPage *_displayPage;
     NSMutableDictionary *_reusablePages;
     BOOL _fixing;
+    BOOL _hasNextPage;
+    BOOL _hasPrevPage;
 }
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;
 @property (nonatomic, weak) id<GmPagerViewDelegate> pagerViewDelegate;
 @property (nonatomic, readonly) GmPagerViewPage *displayPage;
+@property (nonatomic, readonly) BOOL hasNextPage;
+@property (nonatomic, readonly) BOOL hasPrevPage;
 
 - (void)loadPage;
 - (void)loadPageWithKey:(id)key;
+- (void)nextPageAnimated:(BOOL)animated;
+- (void)prevPageAnimated:(BOOL)animated;
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier;
 
 @end

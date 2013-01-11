@@ -11,6 +11,8 @@
 @implementation GmPagerView
 
 @synthesize displayPage = _displayPage;
+@synthesize hasNextPage = _hasNextPage;
+@synthesize hasPrevPage = _hasPrevPage;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -48,6 +50,24 @@
     _cachedPages = nil;
     _cachedPages = [[NSMutableDictionary alloc]init];
     [self loadPagesWithDisplayKey:key];
+}
+
+- (void)nextPageAnimated:(BOOL)animated
+{
+    if(self.hasNextPage)
+    {
+        NSInteger targetPos = _currentPagePosition + 1;
+        [self setContentOffset:CGPointMake(self.frame.size.width * targetPos, 0) animated:animated];
+    }
+}
+
+- (void)prevPageAnimated:(BOOL)animated
+{
+    if(self.hasPrevPage)
+    {
+        NSInteger targetPos = _currentPagePosition - 1;
+        [self setContentOffset:CGPointMake(self.frame.size.width * targetPos, 0) animated:animated];
+    }
 }
 
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier
@@ -96,6 +116,8 @@
         self.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height);
         [self setPage:displayPage toPosition:0 withKey:displayKey];
         _currentPagePosition = 0;
+        _hasNextPage = NO;
+        _hasPrevPage = NO;
     }
     else if(leftPage == nil)
     {
@@ -103,6 +125,8 @@
         [self setPage:displayPage toPosition:0 withKey:displayKey];
         [self setPage:rightPage toPosition:1 withKey:rightKey];
         _currentPagePosition = 0;
+        _hasNextPage = YES;
+        _hasPrevPage = NO;
     }
     else if(rightPage == nil)
     {
@@ -111,6 +135,8 @@
         [self setPage:displayPage toPosition:1 withKey:displayKey];
         [self setPage:leftPage toPosition:0 withKey:leftKey];
         _currentPagePosition = 1;
+        _hasNextPage = NO;
+        _hasPrevPage = YES;
     }
     else
     {
@@ -120,6 +146,8 @@
         [self setPage:displayPage toPosition:1 withKey:displayKey];
         [self setPage:rightPage toPosition:2 withKey:rightKey];
         _currentPagePosition = 1;
+        _hasNextPage = YES;
+        _hasPrevPage = YES;
     }
     
     [self.pagerViewDelegate pagerView:self didShowPage:displayPage fromPage:_displayPage];
