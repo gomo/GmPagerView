@@ -34,7 +34,7 @@
 {
     _cachedPages = [[NSMutableDictionary alloc]init];
     
-    [self loadPagesWithDisplayKey:[self.pagerViewDataSource initialKeyForPagerView:self]];
+    [self loadPagesWithDisplayKey:[self.pagerViewDataSource firstKeyForPagerView:self]];
 }
 
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier

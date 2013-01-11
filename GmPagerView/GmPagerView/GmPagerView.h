@@ -17,7 +17,7 @@ typedef enum {
 @class GmPagerView;
 @protocol GmPagerViewDataSource
 
-- (id)initialKeyForPagerView:(GmPagerView *)pagerView;
+- (id)firstKeyForPagerView:(GmPagerView *)pagerView;
 - (id)pagerView:(GmPagerView *)pagerView keyWithBaseKey:(id)baseKey direction:(GmPagerViewDirection)direction;
 - (GmPagerViewPage *)pagerView:(GmPagerView *)pagerView pageForKey:(id)key;
 
