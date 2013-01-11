@@ -127,6 +127,7 @@
     _displayPage = displayPage;
     
     _fixing = NO;
+    //NSLog(@"%@", _cachedPages);
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -134,15 +135,14 @@
     page.frame = CGRectMake(self.frame.size.width * position, 0, self.frame.size.width, self.frame.size.height);
     [self addSubview:page];
     
-    [_cachedPages setObject:@{@"page":page, @"key":key} forKey:[NSNumber numberWithInteger:position]];
+    [_cachedPages setObject:page forKey:[NSNumber numberWithInteger:position]];
 }
 
 - (void)clearCacheAtPagePosition:(NSInteger)position
 {
     NSNumber *posNumber = [NSNumber numberWithInteger:position];
-    NSDictionary *dic = [_cachedPages objectForKey:posNumber];
+    GmPagerViewPage *page = [_cachedPages objectForKey:posNumber];
     [_cachedPages removeObjectForKey:posNumber];
-    GmPagerViewPage *page = [dic objectForKey:@"page"];
     [page removeFromSuperview];
     page.pageKey = nil;
     [page prepareForReuse];
@@ -170,13 +170,15 @@
     NSNumber *removePosNum = nil;
     for (NSNumber *posNum in _cachedPages)
     {
-        NSDictionary *dic = [_cachedPages objectForKey:posNum];
-        id targetKey = [dic objectForKey:@"key"];
-        if([targetKey isEqual:key])
+        page = [_cachedPages objectForKey:posNum];
+        if([page.pageKey isEqual:key])
         {
-            page = [dic objectForKey:@"page"];
             removePosNum = posNum;
             break;
+        }
+        else
+        {
+            page = nil;
         }
     }
     
