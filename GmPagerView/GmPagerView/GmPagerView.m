@@ -32,9 +32,22 @@
 
 - (void)loadPage
 {
-    _cachedPages = [[NSMutableDictionary alloc]init];
+    [self loadPageWithKey:[self.pagerViewDataSource firstKeyForPagerView:self]];
+}
+
+- (void)loadPageWithKey:(id)key
+{
+    for (UIView *view in self.subviews)
+    {
+        if([view isKindOfClass:[GmPagerViewPage class]])
+        {
+            [view removeFromSuperview];
+        }
+    }
     
-    [self loadPagesWithDisplayKey:[self.pagerViewDataSource firstKeyForPagerView:self]];
+    _cachedPages = nil;
+    _cachedPages = [[NSMutableDictionary alloc]init];
+    [self loadPagesWithDisplayKey:key];
 }
 
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier
@@ -58,9 +71,7 @@
 #pragma mark - private
 - (void)loadPagesWithDisplayKey:(id)displayKey
 {
-    
-    
-    GmPagerViewPage *displayPage = [self loadPageWithKey:displayKey];
+    GmPagerViewPage *displayPage = [self pageWithKey:displayKey];
     [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:_displayPage];
     
     GmPagerViewPage *leftPage = nil;
@@ -68,14 +79,14 @@
     
     if(leftKey != nil)
     {
-        leftPage = [self loadPageWithKey:leftKey];
+        leftPage = [self pageWithKey:leftKey];
     }
     
     GmPagerViewPage *rightPage = nil;
     id rightKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionRight];
     if(rightKey != nil)
     {
-        rightPage = [self loadPageWithKey:rightKey];
+        rightPage = [self pageWithKey:rightKey];
     }
     
     _fixing = YES;
@@ -177,7 +188,7 @@
     return page;
 }
 
-- (GmPagerViewPage *)loadPageWithKey:(id)key
+- (GmPagerViewPage *)pageWithKey:(id)key
 {
     GmPagerViewPage *page = [self pageFromCache:key];
     

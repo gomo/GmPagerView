@@ -44,6 +44,7 @@ typedef enum {
 @property (nonatomic, readonly) GmPagerViewPage *displayPage;
 
 - (void)loadPage;
+- (void)loadPageWithKey:(id)key;
 - (GmPagerViewPage *)dequeueReusablePageWithIdentifier:(NSString *)identifier;
 
 @end
