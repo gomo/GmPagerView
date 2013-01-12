@@ -114,6 +114,7 @@
     if(leftPage == nil && rightPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height);
+        [self movePageToPosition:0];
         [self setPage:displayPage toPosition:0 withKey:displayKey];
         _currentPagePosition = 0;
         _hasNextPage = NO;
@@ -122,6 +123,7 @@
     else if(leftPage == nil)
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
+        [self movePageToPosition:0];
         [self setPage:displayPage toPosition:0 withKey:displayKey];
         [self setPage:rightPage toPosition:1 withKey:rightKey];
         _currentPagePosition = 0;
