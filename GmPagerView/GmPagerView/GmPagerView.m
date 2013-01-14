@@ -26,6 +26,7 @@
         self.scrollsToTop = NO;
         
         _fixing = NO;
+        _nextPage = nil;
         
         _reusablePages = [[NSMutableDictionary alloc]init];
     }
@@ -49,7 +50,10 @@
     
     _cachedPages = nil;
     _cachedPages = [[NSMutableDictionary alloc]init];
-    [self loadPagesWithDisplayKey:key];
+    
+    GmPagerViewPage *displayPage = [self pageWithKey:key];
+    [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:nil];
+    [self loadPagesWithDisplayKey:displayPage];
 }
 
 - (void)nextPageAnimated:(BOOL)animated
@@ -89,13 +93,13 @@
 }
 
 #pragma mark - private
-- (void)loadPagesWithDisplayKey:(id)displayKey
+- (void)loadPagesWithDisplayKey:(GmPagerViewPage *)displayPage
 {
-    GmPagerViewPage *displayPage = [self pageWithKey:displayKey];
-    [self.pagerViewDelegate pagerView:self willShowPage:displayPage fromPage:_displayPage];
+    //GmPagerViewPage *displayPage = [self pageWithKey:displayKey];
+    
     
     GmPagerViewPage *leftPage = nil;
-    id leftKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionLeft];
+    id leftKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayPage.pageKey direction:GmPagerViewDirectionLeft];
     
     if(leftKey != nil)
     {
@@ -103,7 +107,7 @@
     }
     
     GmPagerViewPage *rightPage = nil;
-    id rightKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayKey direction:GmPagerViewDirectionRight];
+    id rightKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:displayPage.pageKey direction:GmPagerViewDirectionRight];
     if(rightKey != nil)
     {
         rightPage = [self pageWithKey:rightKey];
@@ -115,7 +119,7 @@
     {
         self.contentSize = CGSizeMake(self.frame.size.width, self.frame.size.height);
         [self movePageToPosition:0];
-        [self setPage:displayPage toPosition:0 withKey:displayKey];
+        [self setPage:displayPage toPosition:0 withKey:displayPage.pageKey];
         _currentPagePosition = 0;
         _hasNextPage = NO;
         _hasPrevPage = NO;
@@ -124,7 +128,7 @@
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
         [self movePageToPosition:0];
-        [self setPage:displayPage toPosition:0 withKey:displayKey];
+        [self setPage:displayPage toPosition:0 withKey:displayPage.pageKey];
         [self setPage:rightPage toPosition:1 withKey:rightKey];
         _currentPagePosition = 0;
         _hasNextPage = YES;
@@ -134,7 +138,7 @@
     {
         self.contentSize = CGSizeMake(self.frame.size.width * 2, self.frame.size.height);
         [self movePageToPosition:1];
-        [self setPage:displayPage toPosition:1 withKey:displayKey];
+        [self setPage:displayPage toPosition:1 withKey:displayPage.pageKey];
         [self setPage:leftPage toPosition:0 withKey:leftKey];
         _currentPagePosition = 1;
         _hasNextPage = NO;
@@ -145,7 +149,7 @@
         self.contentSize = CGSizeMake(self.frame.size.width * 3, self.frame.size.height);
         [self movePageToPosition:1];
         [self setPage:leftPage toPosition:0 withKey:leftKey];
-        [self setPage:displayPage toPosition:1 withKey:displayKey];
+        [self setPage:displayPage toPosition:1 withKey:displayPage.pageKey];
         [self setPage:rightPage toPosition:2 withKey:rightKey];
         _currentPagePosition = 1;
         _hasNextPage = YES;
@@ -157,7 +161,6 @@
     _displayPage = displayPage;
     
     _fixing = NO;
-    //NSLog(@"%@", _cachedPages);
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -227,10 +230,9 @@
     if(page == nil)
     {
         page = [self.pagerViewDataSource pagerView:self pageForKey:key];
+        page.pageKey = key;
+        page.pagerView = self;
     }
-    
-    page.pageKey = key;
-    page.pagerView = self;
     
     return page;
 }
@@ -244,6 +246,23 @@
         float fractionalPage = scrollView.contentOffset.x / pageWidth;
         if(_currentPagePosition != fractionalPage)
         {
+            NSInteger halfPage = lround(fractionalPage);
+            if(_nextPage == nil && halfPage != _currentPagePosition)
+            {
+                id nextKey;
+                if(halfPage > _currentPagePosition)
+                {
+                    nextKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionRight];
+                }
+                else
+                {
+                    nextKey = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionLeft];
+                }
+                
+                _nextPage = [self pageWithKey:nextKey];
+                [self.pagerViewDelegate pagerView:self willShowPage:_nextPage fromPage:_displayPage];
+            }
+            
             NSInteger newPage;
             if(fractionalPage > _currentPagePosition)
             {
@@ -256,25 +275,17 @@
             
             if(newPage != _currentPagePosition)
             {
-                id key;
                 if(newPage > _currentPagePosition)
                 {
-                    key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionRight];
-                    if(_cachedPages.count == 3)
-                    {
-                        [self clearCacheAtPagePosition:0];
-                    }
+                    [self clearCacheAtPagePosition:0];
                 }
                 else
                 {
-                    key = [self.pagerViewDataSource pagerView:self keyWithBaseKey:_displayPage.pageKey direction:GmPagerViewDirectionLeft];
-                    if(_cachedPages.count == 3)
-                    {
-                        [self clearCacheAtPagePosition:2];
-                    }
+                    [self clearCacheAtPagePosition:1];
                 }
                 
-                [self loadPagesWithDisplayKey:key];
+                [self loadPagesWithDisplayKey:_nextPage];
+                _nextPage = nil;
             }
         }
     }

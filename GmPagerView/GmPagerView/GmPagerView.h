@@ -39,6 +39,7 @@ typedef enum {
     BOOL _fixing;
     BOOL _hasNextPage;
     BOOL _hasPrevPage;
+    GmPagerViewPage *_nextPage;
 }
 
 @property (nonatomic, weak) id<GmPagerViewDataSource> pagerViewDataSource;
