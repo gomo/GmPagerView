@@ -161,8 +161,6 @@
     _displayPage = displayPage;
     
     _fixing = NO;
-    
-    NSLog(@"%@", _cachedPages);
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -232,10 +230,9 @@
     if(page == nil)
     {
         page = [self.pagerViewDataSource pagerView:self pageForKey:key];
+        page.pageKey = key;
+        page.pagerView = self;
     }
-    
-    page.pageKey = key;
-    page.pagerView = self;
     
     return page;
 }
@@ -280,17 +277,11 @@
             {
                 if(newPage > _currentPagePosition)
                 {
-                    if(_cachedPages.count == 3)
-                    {
-                        [self clearCacheAtPagePosition:0];
-                    }
+                    [self clearCacheAtPagePosition:0];
                 }
                 else
                 {
-                    if(_cachedPages.count == 3)
-                    {
-                        [self clearCacheAtPagePosition:2];
-                    }
+                    [self clearCacheAtPagePosition:1];
                 }
                 
                 [self loadPagesWithDisplayKey:_nextPage];
