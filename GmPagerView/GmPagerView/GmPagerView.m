@@ -175,21 +175,25 @@
 {
     NSNumber *posNumber = [NSNumber numberWithInteger:position];
     GmPagerViewPage *page = [_cachedPages objectForKey:posNumber];
-    [_cachedPages removeObjectForKey:posNumber];
-    [page removeFromSuperview];
-    page.pageKey = nil;
-    [page prepareForReuse];
     
-    NSAssert1(page.reuseIdentifier != nil, @"reuseIdentifier is null for %@", page);
-    
-    NSMutableArray *caches = [_reusablePages objectForKey:page.reuseIdentifier];
-    if(caches == nil)
+    if(page != nil)
     {
-        caches = [[NSMutableArray alloc]init];
-        [_reusablePages setObject:caches forKey:page.reuseIdentifier];
+        [_cachedPages removeObjectForKey:posNumber];
+        [page removeFromSuperview];
+        page.pageKey = nil;
+        [page prepareForReuse];
+        
+        NSAssert1(page.reuseIdentifier != nil, @"reuseIdentifier is null for %@", page);
+        
+        NSMutableArray *caches = [_reusablePages objectForKey:page.reuseIdentifier];
+        if(caches == nil)
+        {
+            caches = [[NSMutableArray alloc]init];
+            [_reusablePages setObject:caches forKey:page.reuseIdentifier];
+        }
+        
+        [caches addObject:page];
     }
-    
-    [caches addObject:page];
 }
 
 - (void) movePageToPosition:(NSInteger)position
@@ -281,7 +285,7 @@
                 }
                 else
                 {
-                    [self clearCacheAtPagePosition:1];
+                    [self clearCacheAtPagePosition:2];
                 }
                 
                 [self loadPagesWithDisplayKey:_nextPage];
