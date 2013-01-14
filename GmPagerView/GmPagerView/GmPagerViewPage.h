@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+@class GmPagerView;
 @interface GmPagerViewPage : UIView
 {
     
@@ -15,6 +16,7 @@
 
 @property(nonatomic, strong) NSString *reuseIdentifier;
 @property(nonatomic, strong) id pageKey;
+@property(nonatomic, weak) GmPagerView *pagerView;
 
 - (void)prepareForReuse;
 

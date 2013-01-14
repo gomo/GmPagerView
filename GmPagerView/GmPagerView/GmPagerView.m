@@ -230,6 +230,7 @@
     }
     
     page.pageKey = key;
+    page.pagerView = self;
     
     return page;
 }
