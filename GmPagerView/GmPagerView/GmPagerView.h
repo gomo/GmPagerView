@@ -23,10 +23,13 @@ typedef enum {
 
 @end
 
-@protocol GmPagerViewDelegate
+@protocol GmPagerViewDelegate <NSObject>
 
+@optional
 - (void)pagerView:(GmPagerView *)pagerView willShowPage:(GmPagerViewPage *)page fromPage:(GmPagerViewPage *)prevPage;
 - (void)pagerView:(GmPagerView *)pagerView didShowPage:(GmPagerViewPage *)page fromPage:(GmPagerViewPage *)prevPage;
+- (void)pagerViewWillBeginScroll:(GmPagerView *)pagerView;
+- (void)pagerViewDidEndScroll:(GmPagerView *)pagerView;
 
 @end
 
@@ -36,6 +39,7 @@ typedef enum {
     NSInteger _currentPagePosition;
     GmPagerViewPage *_displayPage;
     NSMutableDictionary *_reusablePages;
+    BOOL _scrolling;
     BOOL _fixing;
     BOOL _hasNextPage;
     BOOL _hasPrevPage;

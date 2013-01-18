@@ -26,6 +26,7 @@
         self.scrollsToTop = NO;
         
         _fixing = NO;
+        _scrolling = NO;
         _nextDisplayPage = nil;
         
         _reusablePages = [[NSMutableDictionary alloc]init];
@@ -141,14 +142,20 @@
         _currentPagePosition = 1;
     }
     
-    _displayPage = _nextDisplayPage;
+    
     _fixing = NO;
     
+    
+    
+    if([self.pagerViewDelegate respondsToSelector:@selector(pagerView:didShowPage:fromPage:)])
+    {
+        [self.pagerViewDelegate pagerView:self didShowPage:_nextDisplayPage fromPage:_displayPage];
+    }
+    
+    _displayPage = _nextDisplayPage;
     _nextDisplayPage = nil;
     _nextLeftKey = nil;
     _nextRightKey = nil;
-    
-    [self.pagerViewDelegate pagerView:self didShowPage:_nextDisplayPage fromPage:_displayPage];
 }
 
 - (void) setPage:(GmPagerViewPage *)page toPosition:(NSInteger)position withKey:(id)key
@@ -251,7 +258,10 @@
         _hasNextPage = NO;
     }
     
-    [self.pagerViewDelegate pagerView:self willShowPage:_nextDisplayPage fromPage:_displayPage];
+    if([self.pagerViewDelegate respondsToSelector:@selector(pagerView:willShowPage:fromPage:)])
+    {
+        [self.pagerViewDelegate pagerView:self willShowPage:_nextDisplayPage fromPage:_displayPage];
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -259,6 +269,15 @@
 {
     if(!_fixing)
     {
+        if(_scrolling == NO)
+        {
+            _scrolling = YES;
+            if([self.pagerViewDelegate respondsToSelector:@selector(pagerViewWillBeginScroll:)])
+            {
+                [self.pagerViewDelegate pagerViewWillBeginScroll:self];
+            }
+        }
+        
         CGFloat pageWidth = scrollView.frame.size.width;
         float fractionalPage = scrollView.contentOffset.x / pageWidth;
         if(_currentPagePosition != fractionalPage)
@@ -304,8 +323,16 @@
                 
                 [self fixingPages];
             }
+            
+            if(fractionalPage == 0.0 || fractionalPage == 1.0 || fractionalPage == 2.0)
+            {
+                _scrolling = NO;
+                if([self.pagerViewDelegate respondsToSelector:@selector(pagerViewDidEndScroll:)])
+                {
+                    [self.pagerViewDelegate pagerViewDidEndScroll:self];
+                }
+            }
         }
     }
 }
-
 @end
