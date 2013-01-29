@@ -305,7 +305,7 @@
             {
                 newPage = floorf(fractionalPage);
             }
-            else if(fractionalPage < _currentPagePosition)
+            else
             {
                 newPage = ceilf(fractionalPage);
             }
