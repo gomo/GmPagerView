@@ -269,6 +269,7 @@
 {
     if(!_fixing)
     {
+        
         if(_scrolling == NO)
         {
             _scrolling = YES;
@@ -279,6 +280,11 @@
         }
         
         CGFloat pageWidth = scrollView.frame.size.width;
+        if(pageWidth == 0.0)
+        {
+            return;
+        }
+        
         float fractionalPage = scrollView.contentOffset.x / pageWidth;
         if(_currentPagePosition != fractionalPage)
         {
