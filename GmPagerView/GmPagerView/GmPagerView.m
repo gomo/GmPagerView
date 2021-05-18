@@ -24,7 +24,6 @@
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
-        self.bounces = NO;
 
         _fixing = NO;
         _scrolling = NO;
