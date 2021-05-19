@@ -24,6 +24,10 @@
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
+        self.bounces = NO;
+        if (@available(iOS 11.0, *)) {
+            self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        }
 
         _fixing = NO;
         _scrolling = NO;
@@ -145,8 +149,6 @@
     
     _fixing = NO;
     
-    // 縦スクロールをストップ。
-    self.contentSize = CGSizeMake(self.contentSize.width, 0);
     
     if([self.pagerViewDelegate respondsToSelector:@selector(pagerView:didShowPage:fromPage:)])
     {
