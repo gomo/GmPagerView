@@ -24,7 +24,7 @@
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.scrollsToTop = NO;
-        self.bounces = NO;
+        self.bounces = YES;
         if (@available(iOS 11.0, *)) {
             self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
@@ -341,6 +341,25 @@
                     [self.pagerViewDelegate pagerViewDidEndScroll:self];
                 }
             }
+        }
+    }
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    CGFloat slack = 30;
+    if(decelerate && scrollView.contentOffset.y < -slack)
+    {
+        if([self.pagerViewDelegate respondsToSelector:@selector(pagerViewDidPullDown:)])
+        {
+            [self.pagerViewDelegate pagerViewDidPullDown:self];
+        }
+    }
+    else if(decelerate && scrollView.contentOffset.y > slack)
+    {
+        if([self.pagerViewDelegate respondsToSelector:@selector(pagerViewDidPullUp:)])
+        {
+            [self.pagerViewDelegate pagerViewDidPullUp:self];
         }
     }
 }

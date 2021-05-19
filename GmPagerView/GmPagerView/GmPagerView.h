@@ -30,6 +30,8 @@ typedef enum {
 - (void)pagerView:(GmPagerView *)pagerView didShowPage:(GmPagerViewPage *)page fromPage:(GmPagerViewPage *)prevPage;
 - (void)pagerViewWillBeginScroll:(GmPagerView *)pagerView;
 - (void)pagerViewDidEndScroll:(GmPagerView *)pagerView;
+- (void)pagerViewDidPullDown:(GmPagerView *)pagerView;
+- (void)pagerViewDidPullUp:(GmPagerView *)pagerView;
 
 @end
 
